@@ -12,6 +12,7 @@ This guide outlines common Alembic commands for managing database migrations.
 - **Create initial migration:**
     ```bash
     alembic revision --autogenerate -m "initial"
+    # alembic -n devdb revision --autogenerate -m "initial"
     ```
 
     This command generates an initial migration script with automatic detection of changes (`--autogenerate`) and a message (`"initial"`).
@@ -19,6 +20,7 @@ This guide outlines common Alembic commands for managing database migrations.
 - **Upgrade to the latest migration:**
     ```bash
     alembic upgrade head
+    # alembic -n devdb upgrade head
     ```
 
     This command applies all migrations up to the latest version (`head`).

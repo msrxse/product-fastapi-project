@@ -9,7 +9,7 @@ engine = create_engine(DEV_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=True)
 
-Base = declarative_base
+Base = declarative_base()
 
 
 def get_db_session():
