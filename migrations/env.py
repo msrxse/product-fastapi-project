@@ -13,6 +13,9 @@ if config.config_file_name is not None:
 
 # override alembic.ini sqlalchemy.url with out os var
 config.set_section_option("devdb", "sqlalchemy.url", os.environ.get("DEV_DATABASE_URL"))
+config.set_section_option(
+    "testdb", "sqlalchemy.url", os.environ.get("TEST_DATABASE_URL")
+)
 
 target_metadata = models.Base.metadata
 

@@ -29,8 +29,8 @@ def wait_for_stable_status(container, stable_duration=3, interval=1):
 
 def start_database_container():
     client = docker.from_env()
-    container_name = "test-db"
     scripts_dir = os.path.abspath("./scripts")
+    container_name = "test-db"
 
     try:
         existing_container = client.containers.get(container_name)
@@ -39,7 +39,7 @@ def start_database_container():
         existing_container.remove()
         print(f"Container {container_name} stopped and removed")
     except docker.errors.NotFound:
-        print(f"Container {container_name} does not exist.")
+        print(f"Container '{container_name}' does not exist.")
 
         # Define container configuration
     container_config = {
