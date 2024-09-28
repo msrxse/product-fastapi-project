@@ -6,13 +6,21 @@ from sqlalchemy import engine_from_config, pool
 
 from app import models
 
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
 config = context.config
 
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# override alembic.ini sqlalchemy.url with out os var
-config.set_section_option("devdb", "sqlalchemy.url", os.environ.get("DEV_DATABASE_URL"))
+# Set the database URLs based on environment variables or any other source
+url_db1 = os.environ.get("DEV_DATABASE_URL")
+url_db2 = os.environ.get("TEST_DATABASE_URL")
+
+# Modify the database URLs in the Alembic config
+config.set_section_option("devdb", "sqlalchemy.url", url_db1)
 config.set_section_option(
     "testdb", "sqlalchemy.url", os.environ.get("TEST_DATABASE_URL")
 )
