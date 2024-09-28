@@ -5,6 +5,7 @@ This guide outlines common Alembic commands for managing database migrations.
 - **Initialize Alembic:**
     ```bash
     alembic init migrations
+    # alembic -n devdb init migrations
     ```
 
     This command initializes Alembic in the specified directory (`alembic`) with a name (`migrations`).

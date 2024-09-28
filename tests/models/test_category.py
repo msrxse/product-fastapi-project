@@ -71,6 +71,15 @@ def test_model_structure_column_constrains(db_inspector):
 - [ ] Verify the correctness of default values for relevant columns.
 """
 
+
+def test_model_structure_default_values(db_inspector):
+    table = "category"
+    columns = {columns["name"]: columns for columns in db_inspector.get_columns(table)}
+
+    assert columns["is_active"]["default"] == "false"
+    assert columns["level"]["default"] == "100"
+
+
 """
 - [ ] Ensure that column lengths align with defined requirements.
 """

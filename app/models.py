@@ -11,8 +11,8 @@ class Category(Base):
     )  # nullable is the default but we add it
     name = Column(String(100), nullable=False)
     slug = Column(String(120), nullable=False)
-    is_active = Column(Boolean, nullable=False)
-    level = Column(Integer, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=False, server_default="False")
+    level = Column(Integer, nullable=False, default="100", server_default="100")
     parent_id = Column(Integer, nullable=True)  # nullable is the default but we add it
 
     __table_args__ = (
