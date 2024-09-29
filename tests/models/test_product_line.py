@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, Integer, Numeric
+from sqlalchemy.dialects.postgresql import UUID
 
 """
 ## Table and Column Validation
@@ -10,7 +11,7 @@ from sqlalchemy import Boolean, Integer, String
 
 
 def test_model_structure_table_exists(db_inspector):
-    assert db_inspector.has_table("category")
+    assert db_inspector.has_table("product_line")
 
 
 """
@@ -19,30 +20,18 @@ def test_model_structure_table_exists(db_inspector):
 
 
 def test_model_structure_column_data_types(db_inspector):
-    table = "category"
+    table = "product_line"
     columns = {columns["name"]: columns for columns in db_inspector.get_columns(table)}
+
     assert isinstance(columns["id"]["type"], Integer)
-    assert isinstance(columns["name"]["type"], String)
-    assert isinstance(columns["slug"]["type"], String)
+    assert isinstance(columns["price"]["type"], type(Numeric(precision=5, scale=2)))
+    assert isinstance(columns["sku"]["type"], UUID)
+    assert isinstance(columns["stock_qty"]["type"], Integer)
     assert isinstance(columns["is_active"]["type"], Boolean)
-    assert isinstance(columns["level"]["type"], Integer)
-    assert isinstance(columns["parent_id"]["type"], Integer)
-
-
-"""
-- [ ] Ensure that column foreign keys correctly defined.
-"""
-
-
-def test_model_structure_column_foreign_key(db_inspector):
-    table = "category"
-    foreign_keys = db_inspector.get_foreign_keys(table)
-
-    category_foreign_key = next(
-        (fk for fk in foreign_keys if set(fk["constrained_columns"]) == {"parent_id"}),
-        None,
-    )
-    assert category_foreign_key is not None
+    assert isinstance(columns["order"]["type"], Integer)
+    assert isinstance(columns["weight"]["type"], Float)
+    assert isinstance(columns["created_at"]["type"], DateTime)
+    assert isinstance(columns["product_id"]["type"], Integer)
 
 
 """
@@ -51,16 +40,19 @@ def test_model_structure_column_foreign_key(db_inspector):
 
 
 def test_model_structure_nullable_constrains(db_inspector):
-    table = "category"
+    table = "product_line"
     columns = db_inspector.get_columns(table)
 
     expected_nullable = {
         "id": False,
-        "name": False,
-        "slug": False,
+        "price": False,
+        "sku": False,
+        "stock_qty": False,
         "is_active": False,
-        "level": False,
-        "parent_id": True,
+        "order": False,
+        "weight": False,
+        "created_at": False,
+        "product_id": False,
     }
 
     for column in columns:
@@ -71,19 +63,35 @@ def test_model_structure_nullable_constrains(db_inspector):
 
 
 """
+- [ ] Ensure that column foreign keys correctly defined.
+"""
+
+
+def test_model_structure_column_foreign_key(db_inspector):
+    table = "product_line"
+    foreign_keys = db_inspector.get_foreign_keys(table)
+
+    product_foreign_key = next(
+        (fk for fk in foreign_keys if set(fk["constrained_columns"]) == {"product_id"}),
+        None,
+    )
+    assert product_foreign_key is not None
+
+
+"""
 - [ ] Test columns with specific constraints to ensure they are accurately defined.
 """
 
 
 def test_model_structure_column_constrains(db_inspector):
-    table = "category"
+    table = "product_line"
     constraints = db_inspector.get_check_constraints(table)
 
     assert any(
-        constraint["name"] == "category_name_length_check" for constraint in constraints
+        constraint["name"] == "product_order_line_range" for constraint in constraints
     )
     assert any(
-        constraint["name"] == "category_slug_length_check" for constraint in constraints
+        constraint["name"] == "product_line_max_value" for constraint in constraints
     )
 
 
@@ -93,24 +101,16 @@ def test_model_structure_column_constrains(db_inspector):
 
 
 def test_model_structure_default_values(db_inspector):
-    table = "category"
+    table = "product_line"
     columns = {columns["name"]: columns for columns in db_inspector.get_columns(table)}
 
+    assert columns["stock_qty"]["default"] == "0"
     assert columns["is_active"]["default"] == "false"
-    assert columns["level"]["default"] == "100"
 
 
 """
 - [ ] Ensure that column lengths align with defined requirements.
 """
-
-
-def test_model_structure_column_lengths(db_inspector):
-    table = "category"
-    columns = {columns["name"]: columns for columns in db_inspector.get_columns(table)}
-
-    assert columns["name"]["type"].length == 100
-    assert columns["slug"]["type"].length == 120
 
 
 """
@@ -119,10 +119,13 @@ def test_model_structure_column_lengths(db_inspector):
 
 
 def test_model_structure_unique_constraints(db_inspector):
-    table = "category"
+    table = "product_line"
     constraints = db_inspector.get_unique_constraints(table)
 
     assert any(
-        constraint["name"] == "uq_category_name_level" for constraint in constraints
+        constraint["name"] == "uq_product_line_sku" for constraint in constraints
     )
-    assert any(constraint["name"] == "uq_category_slug" for constraint in constraints)
+    assert any(
+        constraint["name"] == "uq_product_line_order_product_id"
+        for constraint in constraints
+    )

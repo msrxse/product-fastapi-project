@@ -38,6 +38,26 @@ def test_model_structure_column_data_types(db_inspector):
 
 
 """
+- [ ] Ensure that column foreign keys correctly defined.
+"""
+
+
+def test_model_structure_column_foreign_key(db_inspector):
+    table = "product"
+    foreign_keys = db_inspector.get_foreign_keys(table)
+
+    product_foreign_key = next(
+        (
+            fk
+            for fk in foreign_keys
+            if set(fk["constrained_columns"]) == {"category_id"}
+        ),
+        None,
+    )
+    assert product_foreign_key is not None
+
+
+"""
 - [ ] Verify nullable or not nullable fields
 """
 
@@ -123,3 +143,4 @@ def test_model_structure_unique_constraints(db_inspector):
 
     assert any(constraint["name"] == "uq_product_name" for constraint in constraints)
     assert any(constraint["name"] == "uq_product_slug" for constraint in constraints)
+    assert any(constraint["name"] == "uq_product_pid" for constraint in constraints)

@@ -1,10 +1,12 @@
 import sqlalchemy
 from sqlalchemy import (
+    DECIMAL,
     Boolean,
     CheckConstraint,
     Column,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -43,9 +45,8 @@ class Product(Base):
     __tablename__ = "product"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    pid = Column(
+    pid = Column(  # we manually specify uniqueness with a constraint, see uq_product_pid, so we dont add unique=True here
         UUID(as_uuid=True),
-        unique=True,
         nullable=False,
         server_default=text("uuid_generate_v4()"),
     )
@@ -78,4 +79,36 @@ class Product(Base):
         CheckConstraint("LENGTH(slug) > 0", name="product_slug_length_check"),
         UniqueConstraint("name", name="uq_product_name"),
         UniqueConstraint("slug", name="uq_product_slug"),
+        UniqueConstraint("pid", name="uq_product_pid"),
+    )
+
+
+class ProductLine(Base):
+    __tablename__ = "product_line"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    price = Column(DECIMAL(5, 2), nullable=False)
+    sku = Column(  # we manually specify uniqueness with a constraint, see uq_product_line_sku, so we dont add unique=True here
+        UUID(as_uuid=True),
+        nullable=False,
+        server_default=text("uuid_generate_v4()"),
+    )
+    stock_qty = Column(Integer, nullable=False, default=0, server_default="0")
+    is_active = Column(Boolean, nullable=False, default=False, server_default="False")
+    order = Column(Integer, nullable=False)
+    weight = Column(Float, nullable=False)
+    created_at = Column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False
+    )
+    product_id = Column(Integer, ForeignKey("product.id"), nullable=False)
+
+    __table_args__ = (
+        CheckConstraint("price>= 0 AND price <= 999.99", name="product_line_max_value"),
+        CheckConstraint(
+            '"order" >=1 AND "order" <= 20', name="product_order_line_range"
+        ),  # order in quotes since it is a reserved word
+        UniqueConstraint(
+            "order", "product_id", name="uq_product_line_order_product_id"
+        ),
+        UniqueConstraint("sku", name="uq_product_line_sku"),
     )
