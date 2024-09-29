@@ -72,7 +72,7 @@ class Product(Base):
         server_default="oos",
     )
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-    # seasonal_id = Column(Integer, ForeignKey("seasonal_event.id"), nullable=True)
+    seasonal_id = Column(Integer, ForeignKey("seasonal_event.id"), nullable=True)
 
     __table_args__ = (
         CheckConstraint("LENGTH(name) > 0", name="product_name_length_check"),
@@ -137,4 +137,21 @@ class ProductImage(Base):
         UniqueConstraint(
             "order", "product_line_id", name="uq_product_image_order_product_line_id"
         ),
+    )
+
+
+class SeasonalEvents(Base):
+    __tablename__ = "seasonal_event"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    name = Column(String(100), nullable=False)
+
+    __table_args__ = (
+        CheckConstraint(
+            "LENGTH(name) > 0",
+            name="seasonal_event_name_length_check",
+        ),
+        UniqueConstraint("name", name="uq_seasonal_event_name"),
     )
