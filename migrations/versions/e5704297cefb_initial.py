@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: bc3437c97cb6
+Revision ID: e5704297cefb
 Revises: 
-Create Date: 2024-09-29 22:10:40.104921
+Create Date: 2024-09-29 22:27:54.574231
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bc3437c97cb6'
+revision: str = 'e5704297cefb'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,6 +27,15 @@ def upgrade() -> None:
     sa.CheckConstraint('LENGTH(name) > 0', name='attribute_name_length_check'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name', name='uq_attribute_name')
+    )
+    op.create_table('attribute_value',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('attribute_value', sa.String(length=100), nullable=False),
+    sa.Column('attribute_id', sa.Integer(), nullable=False),
+    sa.CheckConstraint('LENGTH(attribute_value) > 0', name='attribute_value_name_length_check'),
+    sa.ForeignKeyConstraint(['attribute_id'], ['attribute_value.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('attribute_value', 'attribute_id', name='uq_attribute_value_attribute_id')
     )
     op.create_table('category',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -124,5 +133,6 @@ def downgrade() -> None:
     op.drop_table('seasonal_event')
     op.drop_table('product_type')
     op.drop_table('category')
+    op.drop_table('attribute_value')
     op.drop_table('attribute')
     # ### end Alembic commands ###
