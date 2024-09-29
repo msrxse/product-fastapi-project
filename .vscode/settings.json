@@ -2,6 +2,7 @@
   "editor.fontFamily": "Menlo, Monaco, 'Courier New', monospace",
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
+  "editor.minimap.enabled": false,
   "workbench.colorTheme": "Noctis Obscuro",
   "workbench.editor.labelFormat": "medium",
   "terminal.integrated.tabs.enabled": false,
