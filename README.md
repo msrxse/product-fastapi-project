@@ -16,5 +16,5 @@
 3. Start uvicorn server - reload already integrated
 
    ```bash
-   fastapi dev main.py
+   fastapi dev app/main.py
    ```
